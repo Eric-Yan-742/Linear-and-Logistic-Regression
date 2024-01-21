@@ -44,9 +44,9 @@ class Linear(object):
                     if label == j:
                         yi = 1
                     else:
-                        yi = -1
+                        yi = 0
                     sum = sum + 2 * (np.dot(W, xi) - yi) * xi
-                self.w[j] = W - self.lr * (self.weight_decay  * W + (1//N) * sum)
+                self.w[j] = W - self.lr * (self.weight_decay  * W + (1/N) * sum)
         return self.w
 
     def predict(self, X_test: np.ndarray) -> np.ndarray:
