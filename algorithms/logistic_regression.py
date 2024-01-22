@@ -33,6 +33,9 @@ class Logistic(object):
         # TODO: implement me
         return 1 / (1 + np.exp(-z))
 
+    def sigmoid_single(self, z: float) -> float:
+        return 1 / (1 + math.exp(-z))
+
     def train(self, X_train: np.ndarray, y_train: np.ndarray, weights: np.ndarray) -> np.ndarray:
         """Train the classifier.
 
@@ -51,17 +54,24 @@ class Logistic(object):
         # TODO: implement me
         for _ in range(self.epochs):
             for j, W in enumerate(self.w):
-                sum = np.zeros(D)
-                yi = np.ones(N)
+                grad_sum = np.zeros(D)
+                yi = 1
                 for i, xi in enumerate(X_train):
                     label = y_train[i]
                     if label == j:
-                        yi[i] = 1
+                        yi = 1
                     else:
-                        yi[i] = 0
-                input = -yi * np.dot(W, xi)
-                sum = np.sum((self.sigmoid(input) * yi)[:, np.newaxis] * xi, axis=0)
-                self.w[j] = W - self.lr * (self.weight_decay * W - (1/N) * sum)
+                        yi = -1
+                    y_pred = np.dot(W, xi)
+                    gradient = self.sigmoid_single(-yi * y_pred) * yi * xi
+                    grad_sum += gradient
+                grad_sum /= N
+                self.w[j] -= self.lr * (self.weight_decay * W - grad_sum)
+
+
+                # input = -yi * np.dot(X_train, W)
+                # sum = np.sum((self.sigmoid(input) * yi)[:, np.newaxis] * X_train, axis=0)
+                # self.w[j] = W - self.lr * (self.weight_decay * W - (1/N) * sum)
         return self.w
 
     def predict(self, X_test: np.ndarray) -> np.ndarray:
