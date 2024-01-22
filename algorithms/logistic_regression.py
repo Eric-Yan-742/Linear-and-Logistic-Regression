@@ -31,7 +31,7 @@ class Logistic(object):
             the sigmoid of the input
         """
         # TODO: implement me
-        pass
+        return 1 / (1 + np.exp(-z))
 
     def train(self, X_train: np.ndarray, y_train: np.ndarray, weights: np.ndarray) -> np.ndarray:
         """Train the classifier.
@@ -49,7 +49,19 @@ class Logistic(object):
         self.w = weights
 
         # TODO: implement me
-
+        for _ in range(self.epochs):
+            for j, W in enumerate(self.w):
+                sum = np.zeros(D)
+                yi = np.ones(N)
+                for i, xi in enumerate(X_train):
+                    label = y_train[i]
+                    if label == j:
+                        yi[i] = 1
+                    else:
+                        yi[i] = 0
+                input = -yi * np.dot(W, xi)
+                sum = np.sum((self.sigmoid(input) * yi)[:, np.newaxis] * xi, axis=0)
+                self.w[j] = W - self.lr * (self.weight_decay * W - (1/N) * sum)
         return self.w
 
     def predict(self, X_test: np.ndarray) -> np.ndarray:
@@ -65,4 +77,11 @@ class Logistic(object):
                 class.
         """
         # TODO: implement me
-        pass
+        N, D = X_test.shape
+        result = np.zeros(N)
+        for i, image in enumerate(X_test):
+            output = np.zeros(D)
+            for j, W in enumerate(self.w):
+                output[j] = np.dot(W, image)
+            result[i] = np.argmax(output)
+        return result
